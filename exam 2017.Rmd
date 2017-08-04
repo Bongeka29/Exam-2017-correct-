@@ -1,0 +1,116 @@
+###Title: Exam 2017
+###Author: Bongeka Buthelezi
+###Date: 4 August 2017
+###output: html
+
+##Question 1
+a) Multiple variables stored in one column i.e.: the group and the location should be separated 
+Observations are placed in columns instead of rows (pain intensity in week 4 and week 8)
+```{r echo=FALSE}
+library(readr)
+#import data
+question_1 <- read_csv("https://dl.dropboxusercontent.com/u/11805474/painblogr/biostats/exam-data-2017/question_1.csv")
+library(dplyr)
+library(tidyr)
+#tidy data
+#baseline, week4 and week 8 all represent diferent pain intensities
+ question_1_correct <- gather( question_1, key =Pain_Intensity, Value =c(`Week 4`, `Week 8`)) 
+ #plot
+```
+
+
+##Question 2
+#Fertility
+
+Null:There is no significant relationship between religion and fertility
+Alternative: Fertility is likely to be greatest with people who are Catholic
+Type of data: Discrete, quantitative data 
+Statistical test: Linear regression
+Assumptions: 1. Variables are ratios
+2.Linear relationship between variables
+3.No outliers
+4.Homoscedasticity
+```{r echo= FALSE}
+library(readr)
+#import data
+question_2 <- read_csv("https://dl.dropboxusercontent.com/u/11805474/painblogr/biostats/exam-data-2017/question_2.csv")
+#  The data is given as ratio's e.g.: 9.96% of the polulation of courtelary is catholic while 90.04 is Protestant
+# Add column to represent Protestant
+library(dplyr)
+library(tidyr)
+question_2_correct <-mutate(question_2, Protestant = 100 - Catholic)
+# Combining the two religions to form one religion variable
+gather_1 <- gather(question_2_correct, key = Religion, Value = c(Catholic, Protestant))
+#plot the data
+plot(gather_1$value, gather_1$Fertility, main = 'religion vs fertility')
+#statistical test
+cor.test(gather_1$value, gather_1$Fertility,
+         method = 'pearson')
+```
+t = -1.5261 ^-17 df= 92
+p-value= 1
+Interpretation: Accept H0 i.e.: The religion that a peron chooses does not affect the fertility of the person.
+
+
+##Question 3
+#Crop yield
+
+Null: There is no difference in the crop yields obatined under different conditions
+Alternative : Treament increases crop yield
+Type of data: Continuos data
+Statistical test: Repeated measures Anova
+Assumptions: 1. The distribution of the data in the population is Gaussian
+2. Equal variance across groups
+3. The errors are independent
+4. Data are unmatched
+significant level= 0.05
+```{r echo=FALSE}
+library(dplyr)
+library(tidyr)
+library(readr)
+#import data
+question_3 <- read_csv("https://dl.dropboxusercontent.com/u/11805474/painblogr/biostats/exam-data-2017/question_3.csv")
+#plot data
+boxplot(question_3)
+#statistical test
+foo <- aov(control ~ treatment_1*treatment_2, data = question_3)
+summary(foo)
+#post hoc test
+pairwise.t.test(question_3$treatment_1, question_3$treatment_2,
+                p.adjust.method = 'holm',
+                paired = FALSE)
+```
+p-value = 0.1024 (treatment_1)
+0.0648 (treatmebt_2)
+interpretation: accept the H0 i.e.: the condition of the field , does not affect crops yielded by that particular field
+
+
+##Question 4
+#Diets
+Null: The type of diet the patients recieved had no influence on the overall disease outcome of the patients.
+Alernative: The Mediterranean diet resulted in fewer disease outcomes.
+Type of data: Catergorical, nominal data
+Statistical test: Chi-squared
+assumptions: 1.Randomn sampling
+2. Independent observations
+3. Large sample
+Statistical significance = 0.05
+```{r echo=FALSE}
+library(dplyr)
+library(tidyr)
+library(readr)
+#import data
+question_4 <- read_csv("https://dl.dropboxusercontent.com/u/11805474/painblogr/biostats/exam-data-2017/question_4.csv")
+#tidy data
+#tabulate data
+question_4_tabl <- xtabs(~ Diet + Condition, data = question_4)
+#plot data
+mosaicplot(question_4_tabl)
+#statitistical test
+#should use CHM however cannot install vcdExtra package
+chisq.test(question_4_tabl)
+
+```
+X^2 = 15.433 df = 2
+p-value = 0.0004454
+Interpretation: Reject H0 , i.e.: The diet of the patient influences the overall disease outcomes with the Mediterranean being the better diet.
